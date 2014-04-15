@@ -49,7 +49,7 @@ namespace MoTrackRecorder
         private Dictionary<JointType, List<float>> xPosition = new Dictionary<JointType, List<float>>();
         private Dictionary<JointType, List<float>> yPosition = new Dictionary<JointType, List<float>>();
         private Dictionary<JointType, List<float>> zPosition = new Dictionary<JointType, List<float>>();
-        
+
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             kinectSensorChooser1.KinectSensorChanged += new DependencyPropertyChangedEventHandler(kinectSensorChooser1_KinectSensorChanged);
@@ -68,10 +68,24 @@ namespace MoTrackRecorder
                 return;
             }
 
+            // Smoothing and correction implemented in Kinect SDK
+            // This code snippet is commented due to comparison of my results with Kinect's
+
+            //var parameters = new TransformSmoothParameters
+            //{
+            //    Smoothing = 0.3f,
+            //    Correction = 0.0f,
+            //    Prediction = 0.0f,
+            //    JitterRadius = 1.0f,
+            //    MaxDeviationRadius = 0.5f
+            //};
+            //sensor.SkeletonStream.Enable(parameters);
+
+
             sensor.SkeletonStream.Enable();
 
             sensor.AllFramesReady += new EventHandler<AllFramesReadyEventArgs>(sensor_AllFramesReady);
-            sensor.DepthStream.Enable(DepthImageFormat.Resolution640x480Fps30); 
+            sensor.DepthStream.Enable(DepthImageFormat.Resolution640x480Fps30);
             sensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
 
             try
@@ -92,7 +106,7 @@ namespace MoTrackRecorder
             }
 
             // Get a skeleton
-            Skeleton first =  GetFirstSkeleton(e);
+            Skeleton first = GetFirstSkeleton(e);
 
             if (first == null)
             {
@@ -106,7 +120,7 @@ namespace MoTrackRecorder
                 startRecording.IsEnabled = true;
             }
 
-            GetCameraPoint(first, e); 
+            GetCameraPoint(first, e);
 
         }
 
@@ -130,7 +144,7 @@ namespace MoTrackRecorder
                         zPosition[joints[i]].Add(first.Joints[joints[i]].Position.Z);
                     }
                 }
-            }        
+            }
         }
 
 
@@ -140,16 +154,16 @@ namespace MoTrackRecorder
             {
                 if (skeletonFrameData == null)
                 {
-                    return null; 
+                    return null;
                 }
 
-                
+
                 skeletonFrameData.CopySkeletonDataTo(allSkeletons);
 
                 // Gets the first tracked skeleton
                 Skeleton first = (from s in allSkeletons
-                                         where s.TrackingState == SkeletonTrackingState.Tracked
-                                         select s).FirstOrDefault();
+                                  where s.TrackingState == SkeletonTrackingState.Tracked
+                                  select s).FirstOrDefault();
 
                 return first;
 
@@ -167,7 +181,7 @@ namespace MoTrackRecorder
                     {
                         sensor.AudioSource.Stop();
                     }
-                    sensor.Dispose(); 
+                    sensor.Dispose();
                 }
             }
         }
@@ -184,15 +198,15 @@ namespace MoTrackRecorder
             Joint scaledJoint = joint.ScaleTo(1366, 768, .3f, .3f);
 
             Canvas.SetLeft(element, scaledJoint.Position.X);
-            Canvas.SetTop(element, scaledJoint.Position.Y); 
-            
+            Canvas.SetTop(element, scaledJoint.Position.Y);
+
         }
 
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            closing = true; 
-            StopKinect(kinectSensorChooser1.Kinect); 
+            closing = true;
+            StopKinect(kinectSensorChooser1.Kinect);
         }
 
         private void startRecording_Click(object sender, RoutedEventArgs e)
@@ -236,7 +250,7 @@ namespace MoTrackRecorder
             // Export buttons
             saveJsonButton.IsEnabled = true;
             saveXmlButton.IsEnabled = true;
-            saveCsvButton.IsEnabled = true;            
+            saveCsvButton.IsEnabled = true;
         }
 
         private void saveJsonButton_Click(object sender, RoutedEventArgs e)
@@ -370,8 +384,9 @@ namespace MoTrackRecorder
         * 
         * Example of output: 
         * <pre>
-        *   Head,"0,7779385","0,9686465","2,232532","0,777445","0,9685029","2,232491" . . .
-        *   . . .
+        *   Head, Head, Head, ShoulderRight, ShoulderRight, ShoulderRight, ShoulderCenter . . .
+        *   "0,7779385","0,9686465","2,232532","0,777445","0,9685029","2,232491", "0,665211" . . .
+        *   . . . (every frame written in new line)
         * </pre>
         */
         private string toCsv()
@@ -381,23 +396,64 @@ namespace MoTrackRecorder
             List<float> tempJointYPositions = new List<float>() { };
             List<float> tempJointZPositions = new List<float>() { };
 
+
+            int k = 0;
             for (int i = 0; i < joints.Count; i++)
             {
-                csvContent += joints[i] + ",";
-                tempJointXPositions = xPosition[joints[i]];
-                tempJointYPositions = yPosition[joints[i]];
-                tempJointZPositions = zPosition[joints[i]];
-                for (int j = 0; j < tempJointXPositions.Count; j++)
+
+
+                for (int j = 0; j < 3; j++)
                 {
-                    csvContent += "\"" + tempJointXPositions[j] + "\","
-                                    + "\"" + tempJointYPositions[j] + "\","
-                                    + "\"" + tempJointZPositions[j] + "\"";
-                    if (j != tempJointXPositions.Count - 1)
+                    csvContent += joints[i];
+
+                    if (k != (joints.Count - 1) || j != 2)
                     {
                         csvContent += ",";
                     }
+                    else
+                    {
+                        csvContent += Environment.NewLine;
+                    }
                 }
-                csvContent += Environment.NewLine;
+
+                k++;
+
+            }
+
+
+            tempJointXPositions = xPosition[joints[0]];
+
+            for (int j = 0; j < tempJointXPositions.Count; j++)
+            {
+
+                k = 0;
+                for (int i = 0; i < joints.Count; i++)
+                {
+
+                    tempJointXPositions = xPosition[joints[i]];
+                    tempJointYPositions = yPosition[joints[i]];
+                    tempJointZPositions = zPosition[joints[i]];
+
+                    csvContent += "\"" + tempJointXPositions[j] + "\","
+                                + "\"" + tempJointYPositions[j] + "\","
+                                + "\"" + tempJointZPositions[j] + "\"";
+
+                    if (k != (joints.Count - 1))
+                    {
+                        csvContent += ",";
+                    }
+                    else
+                    {
+                        csvContent += Environment.NewLine;
+                    }
+
+                    tempJointXPositions.Clear();
+                    tempJointYPositions.Clear();
+                    tempJointZPositions.Clear();
+                    k++;
+
+                }
+
             }
 
             return csvContent;
