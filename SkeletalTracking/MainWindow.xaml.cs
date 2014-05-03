@@ -392,6 +392,7 @@ namespace MoTrackRecorder
         private string toCsv()
         {
             string csvContent = "";
+            int numberOfFrames = 0;
             List<float> tempJointXPositions = new List<float>() { };
             List<float> tempJointYPositions = new List<float>() { };
             List<float> tempJointZPositions = new List<float>() { };
@@ -421,9 +422,9 @@ namespace MoTrackRecorder
             }
 
 
-            tempJointXPositions = xPosition[joints[0]];
+            numberOfFrames = xPosition[joints[0]].Count;
 
-            for (int j = 0; j < tempJointXPositions.Count; j++)
+            for (int j = 0; j < numberOfFrames; j++)
             {
 
                 k = 0;
@@ -447,9 +448,6 @@ namespace MoTrackRecorder
                         csvContent += Environment.NewLine;
                     }
 
-                    tempJointXPositions.Clear();
-                    tempJointYPositions.Clear();
-                    tempJointZPositions.Clear();
                     k++;
 
                 }

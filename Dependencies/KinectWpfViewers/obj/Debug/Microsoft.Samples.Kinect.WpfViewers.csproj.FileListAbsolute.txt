@@ -104,6 +104,7 @@ C:\Users\danielfe\Desktop\v1\KinectforWindowsSDKV1\Dependencies\KinectWpfViewers
 C:\Users\danielfe\Desktop\v1\KinectforWindowsSDKV1\Dependencies\KinectWpfViewers\obj\Debug\Microsoft.Samples.Kinect.WpfViewers.pdb
 D:\SkyDrive\Dokumenty\MUNI\Bakalárka\MoTrackRecorder\Dependencies\KinectWpfViewers\bin\Debug\Microsoft.Samples.Kinect.WpfViewers.dll
 D:\SkyDrive\Dokumenty\MUNI\Bakalárka\MoTrackRecorder\Dependencies\KinectWpfViewers\bin\Debug\Microsoft.Samples.Kinect.WpfViewers.pdb
+D:\SkyDrive\Dokumenty\MUNI\Bakalárka\MoTrackRecorder\Dependencies\KinectWpfViewers\obj\Debug\Microsoft.Samples.Kinect.WpfViewers.csprojResolveAssemblyReference.cache
 D:\SkyDrive\Dokumenty\MUNI\Bakalárka\MoTrackRecorder\Dependencies\KinectWpfViewers\obj\Debug\KinectSettings.baml
 D:\SkyDrive\Dokumenty\MUNI\Bakalárka\MoTrackRecorder\Dependencies\KinectWpfViewers\obj\Debug\KinectSensorChooser.g.cs
 D:\SkyDrive\Dokumenty\MUNI\Bakalárka\MoTrackRecorder\Dependencies\KinectWpfViewers\obj\Debug\KinectAudioViewer.g.cs
